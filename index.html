@@ -3,148 +3,191 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NEXARION</title>
+<title>NEXARION - Mobile Analyst</title>
 
 <style>
   :root {
-    --primary: #0a0a0a2;
-    --gold: #c5a059;
-    --dark: #232323;
-    --white: #ffffff;
-    --bg-body: #111111;
-    --bg-wrapper: #d6d2c4;
-    --out-red: #8b0000;
+    --bg-main: #050505;
+    --bg-card: #0d0d0d;
+    --accent: #00f2ff; /* Neon Teal */
+    --accent-dim: #008b8b;
+    --alert-double: #ff007f; /* Neon Pink untuk Double */
+    --text-white: #ffffff;
+    --text-gray: #777777;
+    --out-red: #ff2a2a;
   }
 
-  /* 1. RESET & LOCK BODY */
+  /* =========================================
+     1. RESET & BASE (MOBILE OPTIMIZED)
+     ========================================= */
   html, body {
-    width: 100%; height: 100%;
-    margin: 0; padding: 0;
-    overflow: hidden; /* Paksa body tidak bisa scroll */
-    background: var(--bg-body);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    touch-action: none; /* Cegah HP me-refresh halaman saat ditarik ke bawah */
+    width: 100%; height: 100%; margin: 0; padding: 0;
+    background: var(--bg-main); color: var(--text-white);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    overflow: hidden; /* Mengunci body agar tidak narik ke bawah (pull-to-refresh) */
   }
 
-  /* 2. AUTH SCREEN */
+  /* =========================================
+     2. AUTHENTICATION SCREEN
+     ========================================= */
   #auth-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: var(--primary); z-index: 99999;
+    background: var(--bg-main); z-index: 99999;
     display: flex; align-items: center; justify-content: center; padding: 20px;
   }
   .auth-card {
-    background: var(--dark); padding: 30px; border-radius: 12px;
-    border: 2px solid var(--gold); text-align: center; width: 100%; max-width: 350px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    background: var(--bg-card); padding: 35px 25px; border-radius: 20px;
+    border: 1px solid var(--accent-dim); text-align: center; width: 100%; max-width: 320px;
+    box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+  }
+  .logo-nxr {
+    width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--accent);
+    box-shadow: 0 0 15px var(--accent); margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; color: var(--accent); font-size: 14px; letter-spacing: 1px;
   }
   #pass-input {
-    width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--gold);
-    margin: 20px 0; text-align: center; font-size: 16px; font-weight: bold;
-    box-sizing: border-box;
+    width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333;
+    margin: 20px 0; text-align: center; font-size: 14px; font-weight: bold;
+    box-sizing: border-box; background: #000; color: var(--accent); outline: none;
+    transition: 0.3s;
   }
+  #pass-input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 242, 255, 0.3); }
   #auth-btn {
-    background: var(--gold); color: var(--primary); padding: 12px 25px;
-    border: none; border-radius: 8px; font-weight: 800; width: 100%; cursor: pointer;
+    background: var(--accent); color: #000; padding: 12px 25px;
+    border: none; border-radius: 10px; font-weight: 800; width: 100%; cursor: pointer;
+    text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
   }
+  #auth-btn:active { transform: scale(0.95); }
 
-  /* 3. MAIN CONTAINER (SCROLLER) */
+  /* =========================================
+     3. MAIN TRACKER UI & GRID SYSTEM
+     ========================================= */
   .main-wrapper {
-    display: none; 
-    width: 100%;
-    height: 100dvh; /* dvh = Dynamic Viewport Height (Bypass Bug Layar Safari) */
-    overflow: auto; /* Scroll HANYA terjadi di dalam sini */
-    background: var(--bg-wrapper);
-    /* BUG FIX: -webkit-overflow-scrolling dihapus agar sticky header tidak hilang! */
+    display: none; width: 100%; height: 100dvh;
+    overflow: auto; background: var(--bg-main);
+    -webkit-overflow-scrolling: touch; /* Smooth scroll khusus di iPhone/Mobile */
   }
+  .header-nxr {
+    text-align: center; padding: 10px 0;
+    background: linear-gradient(to bottom, #111, var(--bg-main));
+    border-bottom: 2px solid var(--accent-dim);
+  }
+  .header-nxr h1 { color: var(--accent); margin: 0; font-size: 16px; letter-spacing: 4px; text-shadow: 0 0 10px var(--accent); }
+  .header-nxr p { color: var(--text-gray); font-size: 8px; text-transform: uppercase; letter-spacing: 2px; margin-top: 3px; }
 
   .grid-table {
     display: grid;
-    grid-template-columns: 60px repeat(8, 140px);
-    grid-auto-rows: max-content; /* Kunci presisi tinggi baris */
+    /* Lebar kolom disesuaikan agar rapi di HP */
+    grid-template-columns: 45px repeat(8, 120px); 
+    grid-auto-rows: max-content;
   }
 
-  /* 4. STICKY ELEMENTS (ANTI-HILANG) */
+  /* STICKY ELEMENTS (ANTI-HILANG SAAT SCROLL) */
   .corner {
     position: sticky; top: 0; left: 0; z-index: 1000;
-    background: #000; border-bottom: 3px solid var(--gold);
-    border-right: 1px solid #444;
+    background: #000; border-bottom: 2px solid var(--accent); border-right: 1px solid #333;
   }
-
   .player-header {
-    position: sticky; top: 0; z-index: 900;
-    background: var(--primary);
-    padding: 10px 6px;
-    border-bottom: 3px solid var(--gold);
-    border-right: 1px solid #2a4a35;
-    /* Explicit flex untuk mencegah konten collapse */
-    display: flex; flex-direction: column; justify-content: center;
+    position: sticky; top: 0; z-index: 900; background: #0a0a0a;
+    padding: 8px 4px; border-bottom: 2px solid var(--accent); border-right: 1px solid #222;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  
+  /* BADGE PATTERN DOUBLE */
+  .pattern-badge {
+    font-size: 8px; font-weight: 800; letter-spacing: 1px;
+    padding: 2px 6px; border-radius: 4px; margin-bottom: 5px;
+    background: #222; color: #555; transition: 0.3s;
+  }
+  .badge-double {
+    background: var(--alert-double); color: #fff;
+    box-shadow: 0 0 10px var(--alert-double); text-shadow: 1px 1px 2px #000;
   }
 
   .label-round {
     position: sticky; left: 0; z-index: 800;
-    background: var(--dark) !important; color: var(--white) !important;
+    background: #000 !important; color: var(--accent) !important;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; border-bottom: 1px solid #444; border-right: 1px solid #444;
+    font-weight: 800; font-size: 10px; border-bottom: 1px solid #1a1a1a; border-right: 1px solid #1a1a1a;
   }
-
   .cycle-separator {
-    /* Merentangkan separator sejauh jumlah kolom */
-    grid-column: 1 / -1; 
-    position: sticky; left: 0; z-index: 850;
-    background: #333; color: var(--gold);
-    height: 38px; display: flex; align-items: center; justify-content: center;
-    font-weight: 900; font-size: 11px; letter-spacing: 2px;
-    border-bottom: 1px solid #222;
+    grid-column: 1 / -1; position: sticky; left: 0; z-index: 850;
+    background: var(--accent-dim); color: #000; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 9px; letter-spacing: 2px; border-bottom: 1px solid #000;
   }
 
-  /* 5. INPUT & SELECT STYLES */
+  /* =========================================
+     4. INPUTS, SELECTS, & DYNAMIC STATES
+     ========================================= */
   .p-input {
-    width: 100%; padding: 8px; border: none;
-    border-radius: 4px; font-weight: 700; font-size: 13px; text-align: center;
-    box-sizing: border-box; outline: 2px solid transparent;
+    width: 95%; padding: 5px; border-radius: 4px; border: 1px solid #333;
+    background: #000; color: var(--accent); font-weight: 700; font-size: 11px; text-align: center;
+    box-sizing: border-box; outline: none;
   }
-  .p-input:focus { outline: 2px solid var(--gold); }
-
+  .p-input:focus { border-color: var(--accent); }
+  
   .status-row { 
-    color: white; display: flex; justify-content: space-between; align-items: center;
-    font-size: 11px; margin-top: 6px; padding: 0 2px;
+    color: var(--text-gray); display: flex; justify-content: space-between; align-items: center;
+    font-size: 9px; margin-top: 5px; width: 95%;
+  }
+  .status-row label { display: flex; align-items: center; gap: 3px; cursor: pointer; }
+  .r-dead-input { 
+    width: 30px; background: #111; color: #fff; border: 1px solid #333; 
+    text-align: center; font-size: 9px; border-radius: 3px; padding: 2px 0;
   }
 
   .select-cell {
-    padding: 6px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;
+    padding: 3px; border-right: 1px solid #111; border-bottom: 1px solid #111;
     display: flex; align-items: center; justify-content: center;
   }
-
   select {
-    width: 100%; height: 38px; border: 1px solid #ccc; border-radius: 6px;
-    font-size: 14px; font-weight: 700; text-align: center; background: #fff; color: #000;
+    width: 100%; height: 32px; border-radius: 4px; border: 1px solid #222;
+    font-size: 11px; font-weight: 700; text-align: center; background: #000; color: #fff;
+    appearance: none; outline: none;
   }
+  select:focus { border-color: var(--accent); }
 
-  /* ZEBRA STRIPES */
-  .row-p1 { background: #ffffff; }
-  .row-p2 { background: #fdfaf2; }
-  .row-p3 { background: #f7f3e9; }
-  .ghost-mirror { background: #e5e1da !important; border: 2px dashed var(--gold) !important; color: #555; }
-  .is-out-bg { background: var(--out-red) !important; }
+  /* ZEBRA STRIPES & GHOST STATES */
+  .row-p1 { background: #0a0a0a; }
+  .row-p2 { background: #0f0f0f; }
+  .row-p3 { background: #0a0a0a; }
+  
+  .ghost-mirror { 
+    background: rgba(0, 242, 255, 0.08) !important; 
+    color: var(--accent); font-style: italic; 
+    border: 1px dashed var(--accent) !important; 
+  }
+  .is-out-bg { background: var(--out-red) !important; color: white !important; border-color: #550000 !important; }
+  .is-out-bg .p-input { background: #550000; color: #fff; border-color: #ff2a2a; }
+  .is-out-bg .pattern-badge { background: #330000; color: #777; box-shadow: none; }
 </style>
 </head>
 <body>
 
 <div id="auth-overlay">
   <div class="auth-card">
-    <h2 style="color:var(--gold); font-size:16px; margin-bottom:15px">"siapa player paling kece di dunia?"</h2>
-    <input type="text" id="pass-input" placeholder="Ketik jawaban..." autocomplete="off">
-    <button id="auth-btn" onclick="checkAuth()">MASUK</button>
+    <div class="logo-nxr">NXR</div>
+    <h2 style="color:var(--accent); font-size:16px; margin-bottom:5px; letter-spacing: 2px;">NEXARION</h2>
+    <p style="color:#666; font-size:10px; letter-spacing: 1px;">"siapa player paling kece di dunia?"</p>
+    <input type="password" id="pass-input" placeholder="Enter Passphrase" autocomplete="off">
+    <button id="auth-btn" onclick="checkAuth()">ENTER SYSTEM</button>
   </div>
 </div>
 
 <div class="main-wrapper" id="tracker-ui">
-  <div class="grid-table" id="main-grid">
-    </div>
+  <div class="header-nxr">
+    <h1>NEXARION MOBILE</h1>
+    <p>Strategic Analyst System</p>
+  </div>
+  <div class="grid-table" id="main-grid"></div>
 </div>
 
 <script>
-// --- AUTHENTICATION ---
+// =========================================
+// 1. AUTHENTICATION LOGIC
+// =========================================
 function checkAuth() {
   const input = document.getElementById('pass-input').value.toLowerCase().trim();
   if (input === "bet the one and only") {
@@ -152,80 +195,82 @@ function checkAuth() {
     document.getElementById('tracker-ui').style.display = 'block';
     init(); // Generate tabel hanya setelah masuk
   } else {
-    alert("Jawaban salah!");
+    alert("Akses Ditolak! Jawaban Salah.");
   }
 }
 
-// --- TRACKER LOGIC ---
+// Trigger Enter untuk form password
+document.getElementById("pass-input").addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    checkAuth();
+  }
+});
+
+// =========================================
+// 2. GRID GENERATOR ENGINE
+// =========================================
 const grid = document.getElementById('main-grid');
 const totalPlayers = 8;
 const totalRounds = 21;
 
 function init() {
   grid.innerHTML = ''; 
-  let currentRow = 1; // KUNCI UTAMA: Paksa browser menetapkan baris secara manual!
+  let currentRow = 1;
 
-  // 1. RENDER CORNER (Row 1, Col 1)
+  // Render Corner Kiri Atas
   let corner = document.createElement('div');
   corner.className = 'corner';
-  corner.style.gridRow = currentRow;
-  corner.style.gridColumn = 1;
+  corner.style.gridRow = currentRow; corner.style.gridColumn = 1;
   grid.appendChild(corner);
 
-  // 2. RENDER HEADERS (Row 1, Col 2-9)
+  // Render Player Headers (Termasuk Badge Double, Input Nama & Status Mati)
   for(let i=0; i<totalPlayers; i++) {
     let div = document.createElement('div');
     div.className = 'player-header';
     div.id = `h-${i}`;
-    div.style.gridRow = currentRow;
-    div.style.gridColumn = i + 2;
+    div.style.gridRow = currentRow; div.style.gridColumn = i + 2;
     div.innerHTML = `
-      <input class="p-input" oninput="syncAll()" placeholder="P${i+1}">
+      <div class="pattern-badge" id="badge-${i}">NORMAL</div>
+      <input class="p-input" oninput="syncAll()" placeholder="PLAYER ${i+1}">
       <div class="status-row">
         <label><input type="checkbox" class="out-check" onchange="syncAll()"> OUT</label>
-        <input type="number" class="r-dead-input" value="10" oninput="syncAll()" style="width:35px; border-radius:3px; border:none; text-align:center">
+        <input type="number" class="r-dead-input" value="10" oninput="syncAll()" title="Ronde Mati">
       </div>
     `;
     grid.appendChild(div);
   }
   currentRow++;
 
-  // 3. RENDER ROUNDS & CELLS
+  // Render Rows untuk Ronde 1 sampai 21
   for(let r=1; r<=totalRounds; r++) {
-    
     // Pembatas Phase
     if(r === 1 || r === 8 || r === 15) {
-      let phase = Math.ceil(r / 7);
       let sep = document.createElement('div');
       sep.className = 'cycle-separator';
-      sep.style.gridRow = currentRow;
-      sep.style.gridColumn = '1 / -1'; // Span full
-      sep.innerText = `PHASE ${phase} (R${r}-${r+6})`;
+      sep.style.gridRow = currentRow; sep.style.gridColumn = '1 / -1';
+      sep.innerText = `PHASE ${Math.ceil(r/7)}`;
       grid.appendChild(sep);
       currentRow++;
     }
 
     let pClass = r <= 7 ? 'row-p1' : (r <= 14 ? 'row-p2' : 'row-p3');
     
-    // Label Ronde Kiri
+    // Label R1, R2, dst.
     let label = document.createElement('div');
     label.className = `label-round ${pClass}`;
-    label.style.gridRow = currentRow;
-    label.style.gridColumn = 1;
+    label.style.gridRow = currentRow; label.style.gridColumn = 1;
     label.innerText = 'R' + r;
     grid.appendChild(label);
 
-    // Kotak Select
+    // Kotak Dropdown per Player
     for(let c=0; c<totalPlayers; c++) {
       let cell = document.createElement('div');
       cell.className = `select-cell ${pClass}`;
-      cell.style.gridRow = currentRow;
-      cell.style.gridColumn = c + 2;
-
+      cell.style.gridRow = currentRow; cell.style.gridColumn = c + 2;
       let s = document.createElement('select');
       s.className = `col-${c} round-${r}`;
-      s.onchange = syncAll;
-      
+      s.onchange = syncAll; // Setiap ubah dropdown, kalkulasi ulang semua
       cell.appendChild(s);
       grid.appendChild(cell);
     }
@@ -233,77 +278,115 @@ function init() {
   }
 }
 
-// --- SYNC ENGINE (TIDAK BERUBAH) ---
+// =========================================
+// 3. CORE ANALYTIC LOGIC (SYNC ALL)
+// =========================================
 function syncAll() {
   const inputs = document.querySelectorAll('.p-input');
   const checks = document.querySelectorAll('.out-check');
   const deadInputs = document.querySelectorAll('.r-dead-input');
+  
   const names = [...inputs].map((inp, idx) => inp.value.trim() || `P${idx+1}`);
 
+  // Catat data kematian pemain (OUT)
   let deathData = {};
   names.forEach((n, i) => {
     deathData[n] = { isDead: checks[i].checked, round: parseInt(deadInputs[i].value) || 0 };
     document.getElementById(`h-${i}`).classList.toggle('is-out-bg', checks[i].checked);
   });
 
-  let globalDeaths = [];
-  Object.values(deathData).forEach(d => { if(d.isDead) globalDeaths.push(d.round); });
-
+  // TAHAP A: SYNC DROPDOWN PHASE 1 (R1 - R7)
   for(let c=0; c<totalPlayers; c++) {
     let host = names[c];
-    let met = [];
+    let met = []; 
+    
     for(let r=1; r<=6; r++) {
       let val = document.querySelector(`.col-${c}.round-${r}`).value;
       if(val) met.push(val);
     }
+
     for(let r=1; r<=7; r++) {
       let sel = document.querySelector(`.col-${c}.round-${r}`);
-      let current = sel.value;
+      let current = sel.value; 
+
+      // Fitur Auto-R7
       if(r === 7 && !current) {
         let notMet = names.filter(n => n !== host && !met.includes(n));
         if(notMet.length === 1) current = notMet[0];
       }
+
+      // Hindari duplikasi / render ulang options
+      let currentVal = current.replace(" 👻", ""); // Bersihkan logo ghost jika terbawa
       sel.innerHTML = '<option value="">-</option>';
       names.forEach(n => {
         if(n !== host) {
           let o = document.createElement('option');
           o.value = n; o.text = n;
-          if(n === current) o.selected = true;
+          if(n === currentVal) o.selected = true;
           sel.add(o);
         }
       });
     }
   }
 
+  // TAHAP B: KALKULASI PHASE 2 & 3 (R8 - R21)
   for(let c=0; c<totalPlayers; c++) {
     let host = names[c];
     let leg1 = [];
-    for(let r=1; r<=7; r++) leg1.push(document.querySelector(`.col-${c}.round-${r}`).value);
+    
+    for(let r=1; r<=7; r++) {
+      leg1.push(document.querySelector(`.col-${c}.round-${r}`).value);
+    }
+    
+    // DETEKSI POLA DOUBLE & UPDATE UI BADGE
     let pattern = (leg1[5] && leg1.slice(0, 5).includes(leg1[5])) ? "r6" : 
                   (leg1[6] && leg1.slice(0, 6).includes(leg1[6])) ? "r7" : "normal";
+    
+    let badge = document.getElementById(`badge-${c}`);
+    if(pattern === "r6") {
+      badge.innerText = "DOUBLE R6";
+      badge.className = "pattern-badge badge-double";
+    } else if(pattern === "r7") {
+      badge.innerText = "DOUBLE R7";
+      badge.className = "pattern-badge badge-double";
+    } else {
+      badge.innerText = "NORMAL";
+      badge.className = "pattern-badge";
+    }
+    
     let leftover = names.filter(n => n !== host).find(n => !leg1.includes(n)) || "";
 
-    let leg2 = (pattern === "r6") ? [leftover, leg1[1], leg1[2], leg1[3], leg1[4], leg1[0], leg1[6]] :
-               (pattern === "r7") ? [leftover, leg1[0], leg1[2], leg1[3], leg1[4], leg1[5], leg1[1]] : [...leg1];
+    // KALKULASI LOGIKA SHIFTING
+    let leg2 = [];
+    if(pattern === "r6") {
+      leg2 = [leftover, leg1[1], leg1[2], leg1[3], leg1[4], leg1[0], leg1[6]];
+    } else if(pattern === "r7") {
+      leg2 = [leftover, leg1[0], leg1[2], leg1[3], leg1[4], leg1[5], leg1[1]];
+    } else {
+      // Pola Normal: Tukar R8 vs R2 dan R9 vs R1
+      leg2 = [leg1[1], leg1[0], leg1[2], leg1[3], leg1[4], leg1[5], leg1[6]];
+    }
 
-    let full = [...leg1, ...leg2, ...leg2];
+    let fullCycle = [...leg1, ...leg2, ...leg2];
 
     for(let r=8; r<=totalRounds; r++) {
       let sel = document.querySelector(`.col-${c}.round-${r}`);
-      let idx = r - 1;
-      let shiftGlobal = 0;
-      globalDeaths.forEach(dr => { if(r >= dr) shiftGlobal++; });
-      idx += shiftGlobal;
+      let idx = r - 1; 
       
-      let enemy = full[idx];
+      let enemy = fullCycle[idx];
       let st = enemy ? deathData[enemy] : null;
 
       sel.classList.remove('ghost-mirror');
+      
+      // LOGIKA GHOST MIRROR (+3 SHIFT) DENGAN TANDA "👻"
       if(st && st.isDead && r > st.round) {
-        enemy = full[idx + 3] || ""; 
+        enemy = fullCycle[idx + 3] || "Ghost"; 
         sel.classList.add('ghost-mirror');
+        sel.innerHTML = `<option value="${enemy}">${enemy} 👻</option>`;
+      } else {
+        sel.innerHTML = `<option value="${enemy}">${enemy || '-'}</option>`;
       }
-      sel.innerHTML = `<option value="${enemy || ''}">${enemy || '-'}</option>`;
+      
       sel.value = enemy || "";
     }
   }
