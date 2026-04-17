@@ -7,112 +7,124 @@
 
 <style>
   :root {
-    --primary: #0a0a0a;
+    --primary: #0a0a0a2;
     --gold: #c5a059;
-    --sand: #f4f1ea;
     --dark: #232323;
     --white: #ffffff;
+    --bg-body: #111111;
+    --bg-wrapper: #d6d2c4;
     --out-red: #8b0000;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  
-  body { 
+  /* 1. RESET & LOCK BODY */
+  html, body {
+    width: 100%; height: 100%;
+    margin: 0; padding: 0;
+    overflow: hidden; /* Paksa body tidak bisa scroll */
+    background: var(--bg-body);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: #d6d2c4;
-    color: var(--dark);
-    height: 100vh;
-    overflow: hidden; /* Mencegah double scroll di HP */
+    touch-action: none; /* Cegah HP me-refresh halaman saat ditarik ke bawah */
   }
 
-  /* AUTH SCREEN */
+  /* 2. AUTH SCREEN */
   #auth-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: var(--primary); z-index: 10000;
+    background: var(--primary); z-index: 99999;
     display: flex; align-items: center; justify-content: center; padding: 20px;
   }
   .auth-card {
-    background: var(--dark); padding: 30px; border-radius: 16px;
+    background: var(--dark); padding: 30px; border-radius: 12px;
     border: 2px solid var(--gold); text-align: center; width: 100%; max-width: 350px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
   #pass-input {
     width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--gold);
-    margin: 20px 0; text-align: center; font-size: 16px;
+    margin: 20px 0; text-align: center; font-size: 16px; font-weight: bold;
+    box-sizing: border-box;
   }
   #auth-btn {
     background: var(--gold); color: var(--primary); padding: 12px 25px;
-    border: none; border-radius: 8px; font-weight: 800; width: 100%;
+    border: none; border-radius: 8px; font-weight: 800; width: 100%; cursor: pointer;
   }
 
-  /* MAIN UI FIX */
+  /* 3. MAIN CONTAINER (SCROLLER) */
   .main-wrapper {
-    display: none;
-    width: 100vw;
-    height: 100vh;
-    overflow: auto; /* Scroll utama di sini */
-    background: var(--white);
-    -webkit-overflow-scrolling: touch;
+    display: none; 
+    width: 100%;
+    height: 100dvh; /* dvh = Dynamic Viewport Height (Bypass Bug Layar Safari) */
+    overflow: auto; /* Scroll HANYA terjadi di dalam sini */
+    background: var(--bg-wrapper);
+    /* BUG FIX: -webkit-overflow-scrolling dihapus agar sticky header tidak hilang! */
   }
 
   .grid-table {
     display: grid;
     grid-template-columns: 60px repeat(8, 140px);
-    /* Kunci tinggi baris agar tidak melar di HP */
-    grid-auto-rows: min-content; 
+    grid-auto-rows: max-content; /* Kunci presisi tinggi baris */
   }
 
+  /* 4. STICKY ELEMENTS (ANTI-HILANG) */
   .corner {
     position: sticky; top: 0; left: 0; z-index: 1000;
-    background: #000; height: 100%; border-bottom: 3px solid var(--gold);
+    background: #000; border-bottom: 3px solid var(--gold);
+    border-right: 1px solid #444;
   }
 
   .player-header {
     position: sticky; top: 0; z-index: 900;
     background: var(--primary);
-    padding: 10px 5px;
+    padding: 10px 6px;
     border-bottom: 3px solid var(--gold);
-    display: flex; flex-direction: column; gap: 5px;
-    min-height: 85px; /* Pastikan tinggi header konsisten */
+    border-right: 1px solid #2a4a35;
+    /* Explicit flex untuk mencegah konten collapse */
+    display: flex; flex-direction: column; justify-content: center;
   }
 
   .label-round {
     position: sticky; left: 0; z-index: 800;
-    background: var(--dark) !important;
-    color: var(--white) !important;
+    background: var(--dark) !important; color: var(--white) !important;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; height: 55px; /* Tinggi baris ronde */
-    border-bottom: 1px solid #444;
+    font-weight: 800; border-bottom: 1px solid #444; border-right: 1px solid #444;
   }
 
   .cycle-separator {
-    grid-column: 1 / span 9;
-    background: #333;
-    color: var(--gold);
-    height: 40px; /* KUNCI TINGGI AGAR TIDAK MELAR */
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 900; font-size: 11px; letter-spacing: 2px;
+    /* Merentangkan separator sejauh jumlah kolom */
+    grid-column: 1 / -1; 
     position: sticky; left: 0; z-index: 850;
+    background: #333; color: var(--gold);
+    height: 38px; display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 11px; letter-spacing: 2px;
+    border-bottom: 1px solid #222;
   }
 
+  /* 5. INPUT & SELECT STYLES */
   .p-input {
-    width: 100%; padding: 6px; border: 1px solid var(--gold);
-    border-radius: 4px; font-weight: 700; font-size: 13px;
+    width: 100%; padding: 8px; border: none;
+    border-radius: 4px; font-weight: 700; font-size: 13px; text-align: center;
+    box-sizing: border-box; outline: 2px solid transparent;
+  }
+  .p-input:focus { outline: 2px solid var(--gold); }
+
+  .status-row { 
+    color: white; display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; margin-top: 6px; padding: 0 2px;
   }
 
-  .status-row { color: white; display: flex; justify-content: space-between; font-size: 10px; }
+  .select-cell {
+    padding: 6px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;
+    display: flex; align-items: center; justify-content: center;
+  }
 
   select {
-    width: 85%; height: 40px; margin: 7px auto;
-    border: 1px solid #ccc; border-radius: 6px;
-    font-size: 14px; font-weight: 700;
+    width: 100%; height: 38px; border: 1px solid #ccc; border-radius: 6px;
+    font-size: 14px; font-weight: 700; text-align: center; background: #fff; color: #000;
   }
 
-  /* Zebra Stripes */
-  .row-p1 { background: #fff; }
+  /* ZEBRA STRIPES */
+  .row-p1 { background: #ffffff; }
   .row-p2 { background: #fdfaf2; }
   .row-p3 { background: #f7f3e9; }
-  
-  .ghost-mirror { background: #e5e1da !important; border: 2px dashed var(--gold) !important; }
+  .ghost-mirror { background: #e5e1da !important; border: 2px dashed var(--gold) !important; color: #555; }
   .is-out-bg { background: var(--out-red) !important; }
 </style>
 </head>
@@ -120,73 +132,108 @@
 
 <div id="auth-overlay">
   <div class="auth-card">
-    <h2 style="color:var(--gold); font-size:16px">"siapa player paling kece di dunia?"</h2>
-    <input type="text" id="pass-input" placeholder="Jawaban..." autocomplete="off">
+    <h2 style="color:var(--gold); font-size:16px; margin-bottom:15px">"siapa player paling kece di dunia?"</h2>
+    <input type="text" id="pass-input" placeholder="Ketik jawaban..." autocomplete="off">
     <button id="auth-btn" onclick="checkAuth()">MASUK</button>
   </div>
 </div>
 
 <div class="main-wrapper" id="tracker-ui">
   <div class="grid-table" id="main-grid">
-    <div class="corner"></div>
-  </div>
+    </div>
 </div>
 
 <script>
+// --- AUTHENTICATION ---
 function checkAuth() {
   const input = document.getElementById('pass-input').value.toLowerCase().trim();
   if (input === "bet the one and only") {
     document.getElementById('auth-overlay').style.display = 'none';
     document.getElementById('tracker-ui').style.display = 'block';
-    init();
+    init(); // Generate tabel hanya setelah masuk
   } else {
     alert("Jawaban salah!");
   }
 }
 
+// --- TRACKER LOGIC ---
 const grid = document.getElementById('main-grid');
 const totalPlayers = 8;
 const totalRounds = 21;
 
 function init() {
-  grid.innerHTML = '<div class="corner"></div>';
+  grid.innerHTML = ''; 
+  let currentRow = 1; // KUNCI UTAMA: Paksa browser menetapkan baris secara manual!
+
+  // 1. RENDER CORNER (Row 1, Col 1)
+  let corner = document.createElement('div');
+  corner.className = 'corner';
+  corner.style.gridRow = currentRow;
+  corner.style.gridColumn = 1;
+  grid.appendChild(corner);
+
+  // 2. RENDER HEADERS (Row 1, Col 2-9)
   for(let i=0; i<totalPlayers; i++) {
     let div = document.createElement('div');
     div.className = 'player-header';
     div.id = `h-${i}`;
+    div.style.gridRow = currentRow;
+    div.style.gridColumn = i + 2;
     div.innerHTML = `
       <input class="p-input" oninput="syncAll()" placeholder="P${i+1}">
       <div class="status-row">
         <label><input type="checkbox" class="out-check" onchange="syncAll()"> OUT</label>
-        <input type="number" class="r-dead-input" value="10" oninput="syncAll()" style="width:30px">
+        <input type="number" class="r-dead-input" value="10" oninput="syncAll()" style="width:35px; border-radius:3px; border:none; text-align:center">
       </div>
     `;
     grid.appendChild(div);
   }
+  currentRow++;
 
+  // 3. RENDER ROUNDS & CELLS
   for(let r=1; r<=totalRounds; r++) {
+    
+    // Pembatas Phase
     if(r === 1 || r === 8 || r === 15) {
       let phase = Math.ceil(r / 7);
       let sep = document.createElement('div');
       sep.className = 'cycle-separator';
+      sep.style.gridRow = currentRow;
+      sep.style.gridColumn = '1 / -1'; // Span full
       sep.innerText = `PHASE ${phase} (R${r}-${r+6})`;
       grid.appendChild(sep);
+      currentRow++;
     }
+
     let pClass = r <= 7 ? 'row-p1' : (r <= 14 ? 'row-p2' : 'row-p3');
+    
+    // Label Ronde Kiri
     let label = document.createElement('div');
-    label.className = `label-round`;
+    label.className = `label-round ${pClass}`;
+    label.style.gridRow = currentRow;
+    label.style.gridColumn = 1;
     label.innerText = 'R' + r;
     grid.appendChild(label);
 
+    // Kotak Select
     for(let c=0; c<totalPlayers; c++) {
+      let cell = document.createElement('div');
+      cell.className = `select-cell ${pClass}`;
+      cell.style.gridRow = currentRow;
+      cell.style.gridColumn = c + 2;
+
       let s = document.createElement('select');
-      s.className = `col-${c} round-${r} ${pClass}`;
+      s.className = `col-${c} round-${r}`;
       s.onchange = syncAll;
-      grid.appendChild(s);
+      
+      cell.appendChild(s);
+      grid.appendChild(cell);
     }
+    currentRow++;
   }
 }
 
+// --- SYNC ENGINE (TIDAK BERUBAH) ---
 function syncAll() {
   const inputs = document.querySelectorAll('.p-input');
   const checks = document.querySelectorAll('.out-check');
@@ -247,6 +294,7 @@ function syncAll() {
       let shiftGlobal = 0;
       globalDeaths.forEach(dr => { if(r >= dr) shiftGlobal++; });
       idx += shiftGlobal;
+      
       let enemy = full[idx];
       let st = enemy ? deathData[enemy] : null;
 
