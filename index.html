@@ -3,104 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NEXARION</title>
+<title>MC Tracker Pro - Mobile Fix</title>
 
 <style>
   :root {
-    --primary: #000000;    /* Deep Forest */
-    --gold: #c5a059;       /* Muted Gold */
-    --sand: #f4f1ea;       /* Background Bone */
-    --dark: #232323;       /* Contrast Dark */
+    --primary: #1b3022;
+    --gold: #c5a059;
+    --sand: #f4f1ea;
+    --dark: #232323;
     --white: #ffffff;
-    --out-red: #8b0000;    
-    --mirror-bg: #e5e1da;  
+    --out-red: #8b0000;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   
   body { 
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: #d6d2c4;
     color: var(--dark);
-    padding: 8px;
     height: 100vh;
-    overflow: hidden;
+    overflow: hidden; /* Mencegah double scroll di HP */
   }
 
-  /* --- AUTH OVERLAY STYLE --- */
+  /* AUTH SCREEN */
   #auth-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: var(--primary);
-    z-index: 9999;
-    display: flex; align-items: center; justify-content: center;
-    padding: 20px;
-    color: var(--white);
-    text-align: center;
+    background: var(--primary); z-index: 10000;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
   }
-
   .auth-card {
-    background: var(--dark);
-    padding: 30px;
-    border-radius: 16px;
-    border: 2px solid var(--gold);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    max-width: 400px; width: 100%;
+    background: var(--dark); padding: 30px; border-radius: 16px;
+    border: 2px solid var(--gold); text-align: center; width: 100%; max-width: 350px;
   }
-
-  .auth-card h2 { color: var(--gold); margin-bottom: 20px; font-size: 18px; line-height: 1.5; }
-  
   #pass-input {
-    width: 100%; padding: 12px; border: 1px solid var(--gold);
-    border-radius: 8px; background: var(--sand);
-    font-weight: bold; font-size: 16px; margin-bottom: 20px; text-align: center;
+    width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--gold);
+    margin: 20px 0; text-align: center; font-size: 16px;
   }
-
   #auth-btn {
-    background: var(--gold); color: var(--primary);
-    padding: 12px 30px; border: none; border-radius: 8px;
-    font-weight: 800; text-transform: uppercase; cursor: pointer;
-    transition: 0.3s;
+    background: var(--gold); color: var(--primary); padding: 12px 25px;
+    border: none; border-radius: 8px; font-weight: 800; width: 100%;
   }
 
-  #auth-btn:hover { background: var(--white); transform: scale(1.05); }
-  #err-msg { color: #ff6b6b; font-size: 12px; margin-top: 10px; display: none; }
-
-  /* --- TRACKER UI (HIDDEN BY DEFAULT) --- */
+  /* MAIN UI FIX */
   .main-wrapper {
-    display: none; /* Muncul setelah pass benar */
-    width: 100%;
-    height: calc(100vh - 16px);
-    overflow: auto;
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto; /* Scroll utama di sini */
     background: var(--white);
-    border-radius: 12px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-    border: 1px solid #b2af9d;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .grid-table { display: grid; grid-template-columns: 70px repeat(8, 150px); position: relative; }
-  .corner { position: sticky; top: 0; left: 0; z-index: 100; background: #000; border-bottom: 3px solid var(--gold); }
-  .player-header { position: sticky; top: 0; z-index: 90; background: var(--primary); padding: 12px 10px; border-bottom: 3px solid var(--gold); display: flex; flex-direction: column; gap: 8px; color: var(--white); }
-  .label-round { position: sticky; left: 0; z-index: 80; background: var(--dark) !important; color: var(--white) !important; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; border-bottom: 1px solid #444; }
-  .cycle-separator { grid-column: 1 / span 9; background: #333; color: var(--gold); padding: 12px; font-weight: 900; font-size: 12px; text-align: center; text-transform: uppercase; letter-spacing: 4px; position: sticky; left: 0; z-index: 85; border-top: 1px solid rgba(255,255,255,0.1); }
-  .p-input { width: 100%; padding: 10px; border: 1px solid var(--gold); border-radius: 6px; font-weight: 700; background: var(--sand); color: #000; font-size: 14px; }
-  .status-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
-  select { width: 90%; margin: 8px auto; padding: 12px 6px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; font-weight: 700; background: var(--white); color: var(--dark); cursor: pointer; }
+  .grid-table {
+    display: grid;
+    grid-template-columns: 60px repeat(8, 140px);
+    /* Kunci tinggi baris agar tidak melar di HP */
+    grid-auto-rows: min-content; 
+  }
+
+  .corner {
+    position: sticky; top: 0; left: 0; z-index: 1000;
+    background: #000; height: 100%; border-bottom: 3px solid var(--gold);
+  }
+
+  .player-header {
+    position: sticky; top: 0; z-index: 900;
+    background: var(--primary);
+    padding: 10px 5px;
+    border-bottom: 3px solid var(--gold);
+    display: flex; flex-direction: column; gap: 5px;
+    min-height: 85px; /* Pastikan tinggi header konsisten */
+  }
+
+  .label-round {
+    position: sticky; left: 0; z-index: 800;
+    background: var(--dark) !important;
+    color: var(--white) !important;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; height: 55px; /* Tinggi baris ronde */
+    border-bottom: 1px solid #444;
+  }
+
+  .cycle-separator {
+    grid-column: 1 / span 9;
+    background: #333;
+    color: var(--gold);
+    height: 40px; /* KUNCI TINGGI AGAR TIDAK MELAR */
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 11px; letter-spacing: 2px;
+    position: sticky; left: 0; z-index: 850;
+  }
+
+  .p-input {
+    width: 100%; padding: 6px; border: 1px solid var(--gold);
+    border-radius: 4px; font-weight: 700; font-size: 13px;
+  }
+
+  .status-row { color: white; display: flex; justify-content: space-between; font-size: 10px; }
+
+  select {
+    width: 85%; height: 40px; margin: 7px auto;
+    border: 1px solid #ccc; border-radius: 6px;
+    font-size: 14px; font-weight: 700;
+  }
+
+  /* Zebra Stripes */
   .row-p1 { background: #fff; }
   .row-p2 { background: #fdfaf2; }
   .row-p3 { background: #f7f3e9; }
-  .ghost-mirror { background: var(--mirror-bg) !important; border: 2px dashed var(--gold) !important; color: #5d4037 !important; font-style: italic; }
+  
+  .ghost-mirror { background: #e5e1da !important; border: 2px dashed var(--gold) !important; }
   .is-out-bg { background: var(--out-red) !important; }
-  .is-out-bg .p-input { background: #ffdada; border-color: #ff0000; }
 </style>
 </head>
 <body>
 
 <div id="auth-overlay">
   <div class="auth-card">
-    <h2>"siapa player paling kece di dunia?"</h2>
-    <input type="text" id="pass-input" placeholder="Ketik jawaban di sini..." autocomplete="off">
-    <button id="auth-btn" onclick="checkAuth()">Verifikasi</button>
-    <p id="err-msg">Jawaban salah, kamu kurang kece!</p>
+    <h2 style="color:var(--gold); font-size:16px">"siapa player paling kece di dunia?"</h2>
+    <input type="text" id="pass-input" placeholder="Jawaban..." autocomplete="off">
+    <button id="auth-btn" onclick="checkAuth()">MASUK</button>
   </div>
 </div>
 
@@ -111,49 +133,32 @@
 </div>
 
 <script>
-// --- VERIFICATION LOGIC ---
 function checkAuth() {
   const input = document.getElementById('pass-input').value.toLowerCase().trim();
-  const target = "bet the one and only";
-  
-  if (input === target) {
+  if (input === "bet the one and only") {
     document.getElementById('auth-overlay').style.display = 'none';
     document.getElementById('tracker-ui').style.display = 'block';
-    init(); // Jalankan tracker
+    init();
   } else {
-    const err = document.getElementById('err-msg');
-    err.style.display = 'block';
-    // Shake effect simple
-    document.querySelector('.auth-card').animate([
-      { transform: 'translateX(0)' },
-      { transform: 'translateX(-10px)' },
-      { transform: 'translateX(10px)' },
-      { transform: 'translateX(0)' }
-    ], { duration: 200 });
+    alert("Jawaban salah!");
   }
 }
 
-// Support 'Enter' key
-document.getElementById('pass-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') { checkAuth(); }
-});
-
-// --- TRACKER LOGIC (RETAINED) ---
 const grid = document.getElementById('main-grid');
 const totalPlayers = 8;
 const totalRounds = 21;
 
 function init() {
-  grid.innerHTML = '<div class="corner"></div>'; // Reset corner
+  grid.innerHTML = '<div class="corner"></div>';
   for(let i=0; i<totalPlayers; i++) {
     let div = document.createElement('div');
     div.className = 'player-header';
     div.id = `h-${i}`;
     div.innerHTML = `
-      <input class="p-input" oninput="syncAll()" placeholder="Player ${i+1}">
+      <input class="p-input" oninput="syncAll()" placeholder="P${i+1}">
       <div class="status-row">
         <label><input type="checkbox" class="out-check" onchange="syncAll()"> OUT</label>
-        <input type="number" class="r-dead-input" value="10" oninput="syncAll()" style="width:40px; border-radius:4px; border:none; text-align:center">
+        <input type="number" class="r-dead-input" value="10" oninput="syncAll()" style="width:30px">
       </div>
     `;
     grid.appendChild(div);
@@ -164,7 +169,7 @@ function init() {
       let phase = Math.ceil(r / 7);
       let sep = document.createElement('div');
       sep.className = 'cycle-separator';
-      sep.innerText = `✧ PUTARAN ${phase} (R${r}-${r+6}) ✧`;
+      sep.innerText = `PHASE ${phase} (R${r}-${r+6})`;
       grid.appendChild(sep);
     }
     let pClass = r <= 7 ? 'row-p1' : (r <= 14 ? 'row-p2' : 'row-p3');
@@ -223,22 +228,13 @@ function syncAll() {
     }
   }
 
-  let playerPatterns = {};
   for(let c=0; c<totalPlayers; c++) {
     let host = names[c];
     let leg1 = [];
     for(let r=1; r<=7; r++) leg1.push(document.querySelector(`.col-${c}.round-${r}`).value);
-    let pattern = "normal";
-    if(leg1[5] && leg1.slice(0, 5).includes(leg1[5])) pattern = "r6";
-    else if(leg1[6] && leg1.slice(0, 6).includes(leg1[6])) pattern = "r7";
+    let pattern = (leg1[5] && leg1.slice(0, 5).includes(leg1[5])) ? "r6" : 
+                  (leg1[6] && leg1.slice(0, 6).includes(leg1[6])) ? "r7" : "normal";
     let leftover = names.filter(n => n !== host).find(n => !leg1.includes(n)) || "";
-    playerPatterns[host] = { pattern, leg1, leftover };
-  }
-
-  for(let c=0; c<totalPlayers; c++) {
-    let host = names[c];
-    let { pattern, leg1, leftover } = playerPatterns[host];
-    if(leg1.filter(x => x).length < 7) continue;
 
     let leg2 = (pattern === "r6") ? [leftover, leg1[1], leg1[2], leg1[3], leg1[4], leg1[0], leg1[6]] :
                (pattern === "r7") ? [leftover, leg1[0], leg1[2], leg1[3], leg1[4], leg1[5], leg1[1]] : [...leg1];
@@ -251,7 +247,6 @@ function syncAll() {
       let shiftGlobal = 0;
       globalDeaths.forEach(dr => { if(r >= dr) shiftGlobal++; });
       idx += shiftGlobal;
-
       let enemy = full[idx];
       let st = enemy ? deathData[enemy] : null;
 
