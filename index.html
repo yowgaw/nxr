@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NEXARION - Mobile Analyst</title>
+<title>NEXARION - Analyst</title>
 
 <style>
   :root {
@@ -24,7 +24,7 @@
     width: 100%; height: 100%; margin: 0; padding: 0;
     background: var(--bg-main); color: var(--text-white);
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    overflow: hidden; /* Mengunci body agar tidak narik ke bawah (pull-to-refresh) */
+    overflow: hidden; 
   }
 
   /* =========================================
@@ -66,7 +66,7 @@
   .main-wrapper {
     display: none; width: 100%; height: 100dvh;
     overflow: auto; background: var(--bg-main);
-    -webkit-overflow-scrolling: touch; /* Smooth scroll khusus di iPhone/Mobile */
+    -webkit-overflow-scrolling: touch; 
   }
   .header-nxr {
     text-align: center; padding: 10px 0;
@@ -78,12 +78,11 @@
 
   .grid-table {
     display: grid;
-    /* Lebar kolom disesuaikan agar rapi di HP */
     grid-template-columns: 45px repeat(8, 120px); 
     grid-auto-rows: max-content;
   }
 
-  /* STICKY ELEMENTS (ANTI-HILANG SAAT SCROLL) */
+  /* STICKY ELEMENTS */
   .corner {
     position: sticky; top: 0; left: 0; z-index: 1000;
     background: #000; border-bottom: 2px solid var(--accent); border-right: 1px solid #333;
@@ -94,7 +93,6 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center;
   }
   
-  /* BADGE PATTERN DOUBLE */
   .pattern-badge {
     font-size: 8px; font-weight: 800; letter-spacing: 1px;
     padding: 2px 6px; border-radius: 4px; margin-bottom: 5px;
@@ -149,7 +147,6 @@
   }
   select:focus { border-color: var(--accent); }
 
-  /* ZEBRA STRIPES & GHOST STATES */
   .row-p1 { background: #0a0a0a; }
   .row-p2 { background: #0f0f0f; }
   .row-p3 { background: #0a0a0a; }
@@ -170,16 +167,16 @@
   <div class="auth-card">
     <div class="logo-nxr">NXR</div>
     <h2 style="color:var(--accent); font-size:16px; margin-bottom:5px; letter-spacing: 2px;">NEXARION</h2>
-    <p style="color:#666; font-size:10px; letter-spacing: 1px;">"siapa player paling kece di dunia?"</p>
-    <input type="password" id="pass-input" placeholder="Enter Passphrase" autocomplete="off">
+    <p style="color:#ececec; font-size:10px; letter-spacing: 1px;">"SIAPA PLAYER YANG MIRIP ZYAN MALIK?"</p>
+    <input type="password" id="pass-input" placeholder="Masukan Jawaban" autocomplete="off">
     <button id="auth-btn" onclick="checkAuth()">ENTER SYSTEM</button>
   </div>
 </div>
 
 <div class="main-wrapper" id="tracker-ui">
   <div class="header-nxr">
-    <h1>NEXARION MOBILE</h1>
-    <p>Strategic Analyst System</p>
+    <h1>NEXARION</h1>
+    <p>Analyst System</p>
   </div>
   <div class="grid-table" id="main-grid"></div>
 </div>
@@ -193,13 +190,12 @@ function checkAuth() {
   if (input === "bet the one and only") {
     document.getElementById('auth-overlay').style.display = 'none';
     document.getElementById('tracker-ui').style.display = 'block';
-    init(); // Generate tabel hanya setelah masuk
+    init();
   } else {
-    alert("Akses Ditolak! Jawaban Salah.");
+    alert("Akses Ditolak! MANEH SAHA!.");
   }
 }
 
-// Trigger Enter untuk form password
 document.getElementById("pass-input").addEventListener("keypress", function(event) {
   if (event.key === "Enter") {
     event.preventDefault();
@@ -218,13 +214,11 @@ function init() {
   grid.innerHTML = ''; 
   let currentRow = 1;
 
-  // Render Corner Kiri Atas
   let corner = document.createElement('div');
   corner.className = 'corner';
   corner.style.gridRow = currentRow; corner.style.gridColumn = 1;
   grid.appendChild(corner);
 
-  // Render Player Headers (Termasuk Badge Double, Input Nama & Status Mati)
   for(let i=0; i<totalPlayers; i++) {
     let div = document.createElement('div');
     div.className = 'player-header';
@@ -242,9 +236,7 @@ function init() {
   }
   currentRow++;
 
-  // Render Rows untuk Ronde 1 sampai 21
   for(let r=1; r<=totalRounds; r++) {
-    // Pembatas Phase
     if(r === 1 || r === 8 || r === 15) {
       let sep = document.createElement('div');
       sep.className = 'cycle-separator';
@@ -256,21 +248,19 @@ function init() {
 
     let pClass = r <= 7 ? 'row-p1' : (r <= 14 ? 'row-p2' : 'row-p3');
     
-    // Label R1, R2, dst.
     let label = document.createElement('div');
     label.className = `label-round ${pClass}`;
     label.style.gridRow = currentRow; label.style.gridColumn = 1;
     label.innerText = 'R' + r;
     grid.appendChild(label);
 
-    // Kotak Dropdown per Player
     for(let c=0; c<totalPlayers; c++) {
       let cell = document.createElement('div');
       cell.className = `select-cell ${pClass}`;
       cell.style.gridRow = currentRow; cell.style.gridColumn = c + 2;
       let s = document.createElement('select');
       s.className = `col-${c} round-${r}`;
-      s.onchange = syncAll; // Setiap ubah dropdown, kalkulasi ulang semua
+      s.onchange = syncAll; 
       cell.appendChild(s);
       grid.appendChild(cell);
     }
@@ -288,7 +278,6 @@ function syncAll() {
   
   const names = [...inputs].map((inp, idx) => inp.value.trim() || `P${idx+1}`);
 
-  // Catat data kematian pemain (OUT)
   let deathData = {};
   names.forEach((n, i) => {
     deathData[n] = { isDead: checks[i].checked, round: parseInt(deadInputs[i].value) || 0 };
@@ -309,14 +298,12 @@ function syncAll() {
       let sel = document.querySelector(`.col-${c}.round-${r}`);
       let current = sel.value; 
 
-      // Fitur Auto-R7
       if(r === 7 && !current) {
         let notMet = names.filter(n => n !== host && !met.includes(n));
         if(notMet.length === 1) current = notMet[0];
       }
 
-      // Hindari duplikasi / render ulang options
-      let currentVal = current.replace(" 👻", ""); // Bersihkan logo ghost jika terbawa
+      let currentVal = current.replace(" 👻", ""); 
       sel.innerHTML = '<option value="">-</option>';
       names.forEach(n => {
         if(n !== host) {
@@ -329,7 +316,24 @@ function syncAll() {
     }
   }
 
-  // TAHAP B: KALKULASI PHASE 2 & 3 (R8 - R21)
+  // TAHAP B.1: PRE-KALKULASI (Deteksi tarikan Double di R8)
+  let pulledByDoubleR8 = new Set();
+  for(let i=0; i<totalPlayers; i++) {
+    let l1 = [];
+    for(let r=1; r<=7; r++) {
+      l1.push(document.querySelector(`.col-${i}.round-${r}`).value);
+    }
+    let pat = (l1[5] && l1.slice(0, 5).includes(l1[5])) ? "r6" : 
+              (l1[6] && l1.slice(0, 6).includes(l1[6])) ? "r7" : "normal";
+    
+    if(pat !== "normal") {
+      pulledByDoubleR8.add(names[i]); 
+      let lover = names.filter(n => n !== names[i]).find(n => !l1.includes(n));
+      if(lover) pulledByDoubleR8.add(lover); 
+    }
+  }
+
+  // TAHAP B.2: KALKULASI PHASE 2 & 3 (R8 - R21)
   for(let c=0; c<totalPlayers; c++) {
     let host = names[c];
     let leg1 = [];
@@ -338,7 +342,6 @@ function syncAll() {
       leg1.push(document.querySelector(`.col-${c}.round-${r}`).value);
     }
     
-    // DETEKSI POLA DOUBLE & UPDATE UI BADGE
     let pattern = (leg1[5] && leg1.slice(0, 5).includes(leg1[5])) ? "r6" : 
                   (leg1[6] && leg1.slice(0, 6).includes(leg1[6])) ? "r7" : "normal";
     
@@ -356,31 +359,51 @@ function syncAll() {
     
     let leftover = names.filter(n => n !== host).find(n => !leg1.includes(n)) || "";
 
-    // KALKULASI LOGIKA SHIFTING
     let leg2 = [];
     if(pattern === "r6") {
       leg2 = [leftover, leg1[1], leg1[2], leg1[3], leg1[4], leg1[0], leg1[6]];
     } else if(pattern === "r7") {
       leg2 = [leftover, leg1[0], leg1[2], leg1[3], leg1[4], leg1[5], leg1[1]];
     } else {
-      // Pola Normal: Tukar R8 vs R2 dan R9 vs R1
-      leg2 = [leg1[1], leg1[0], leg1[2], leg1[3], leg1[4], leg1[5], leg1[6]];
+      let targetR8 = leg1[0]; 
+      if(pulledByDoubleR8.has(targetR8) || pulledByDoubleR8.has(host)) {
+        leg2 = [leg1[1], leg1[0], leg1[2], leg1[3], leg1[4], leg1[5], leg1[6]];
+      } else {
+        leg2 = [...leg1];
+      }
     }
 
-    let fullCycle = [...leg1, ...leg2, ...leg2];
+    // Array fullCycle panjang untuk mengamankan pergeseran (skip)
+    let fullCycle = [...leg1, ...leg2, ...leg2, ...leg1, ...leg2, ...leg2, ...leg1, ...leg2];
 
     for(let r=8; r<=totalRounds; r++) {
       let sel = document.querySelector(`.col-${c}.round-${r}`);
-      let idx = r - 1; 
+      let baseIdx = r - 1; 
       
-      let enemy = fullCycle[idx];
+      // LOGIKA BARU: LOMPAT 1 ROUND JIKA ADA YANG OUT PADA RONDE TERSEBUT ATAU SEBELUMNYA
+      // Menghitung berapa banyak player yang sudah mati
+      let deadCountBeforeRound = 0;
+      names.forEach(n => {
+        let dData = deathData[n];
+        // PERUBAHAN DISINI: Memakai >= agar pergeseran langsung terjadi di ronde kematian
+        if (dData.isDead && r >= dData.round) {
+          deadCountBeforeRound++;
+        }
+      });
+
+      // Indeks bergeser (melompat) sesuai dengan jumlah player yang mati, urutan siklus terjaga
+      let currentIdx = baseIdx + deadCountBeforeRound;
+      
+      let enemy = fullCycle[currentIdx];
       let st = enemy ? deathData[enemy] : null;
 
       sel.classList.remove('ghost-mirror');
       
       // LOGIKA GHOST MIRROR (+3 SHIFT) DENGAN TANDA "👻"
-      if(st && st.isDead && r > st.round) {
-        enemy = fullCycle[idx + 3] || "Ghost"; 
+      // Mengeksekusi Ghost jika musuh hasil "lompatan" tadi ternyata juga sudah mati
+      // PERUBAHAN DISINI: Memakai >= untuk mendeteksi lawan yang out
+      if(st && st.isDead && r >= st.round) {
+        enemy = fullCycle[currentIdx + 3] || "Ghost"; 
         sel.classList.add('ghost-mirror');
         sel.innerHTML = `<option value="${enemy}">${enemy} 👻</option>`;
       } else {
